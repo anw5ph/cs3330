@@ -15,7 +15,7 @@ register pP {
 pc = P_pc;
 
 # we can define our own input/output "wires" of any number of 0<bits<=80
-wire opcode:8, icode:4;
+wire opcode:8, icode:4, rA:4, rB:4, valC:64;
 
 # the x[i..j] means "just the bits between i and j".  x[0..1] is the 
 # low-order bit, similar to what the c code "x&1" does; "x&7" is x[0..3]
@@ -28,10 +28,6 @@ icode = opcode[4..8];      # top nibble of that byte
 
 # named constants can help make code readable
 const TOO_BIG = 0xC; # the first unused icode in Y86-64
-
-# some named constants are built-in: the icodes, ifuns, STAT_??? and REG_???
-
-wire rA:4, rB:4, valC:64;
 
 rA = [
     icode == RRMOVQ : i10bytes[12..16];
@@ -54,9 +50,9 @@ valC = [
 # "continue".  The following uses the mux syntax described in the 
 # textbook
 Stat = [
-    icode == HALT    : STAT_HLT;
-    icode >= TOO_BIG : STAT_INS;
-	1                : STAT_AOK;
+    icode == HALT        : STAT_HLT;
+    icode >= TOO_BIG     : STAT_INS;
+    1                    : STAT_AOK;
     
 ];
 
