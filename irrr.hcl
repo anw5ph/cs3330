@@ -52,9 +52,9 @@ valC = [
 # "continue".  The following uses the mux syntax described in the 
 # textbook
 Stat = [
-    icode == HALT    : STAT_HLT;
-    icode >= TOO_BIG : STAT_INS;
-	1                : STAT_AOK;
+    icode == HALT        : STAT_HLT;
+    icode >= TOO_BIG     : STAT_INS;
+    1                    : STAT_AOK;
     
 ];
 
