@@ -124,12 +124,13 @@ c_SF = (valE >= 0x8000000000000000);
 stall_C = (icode != OPQ);
 
 conditionsMet = [
+    ifun == 0   : 1;
     ifun == 1   : (C_SF || C_ZF);
     ifun == 2   : (C_SF & !C_ZF);
     ifun == 3   : C_ZF;
     ifun == 4   : !C_ZF;
     ifun == 5   : (!C_SF || C_ZF);
-    ifun == 6   : (!C_SF & !C_ZF);   
-    1           : 1;
+    ifun == 6   : (!C_SF & !C_ZF);
+    1           : 0;
 ];
 
