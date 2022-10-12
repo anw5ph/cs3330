@@ -4,6 +4,7 @@ register fF {
     
 }
 
+########## Decode and writeback register bank #############
 register dW {
     icode:4 = 0;
     valA:64 = 0;
@@ -63,10 +64,9 @@ d_dstE = rB;
 
 ########## Writeback #############
 
-
-# destination selection
 Stat = W_Stat;
 
+# destination selection
 reg_dstE = [
 	W_icode in {IRMOVQ, RRMOVQ} : W_dstE;
 	1 : REG_NONE;
