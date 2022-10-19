@@ -14,6 +14,7 @@ pc = F_pc;
 f_icode = i10bytes[4..8];
 f_ifun = i10bytes[0..4];
 
+# Register A
 f_rA = [
     f_icode == RRMOVQ : i10bytes[12..16];
     f_icode == IRMOVQ : i10bytes[12..16];
@@ -22,6 +23,7 @@ f_rA = [
     1 : REG_NONE;
 ];
 
+# Register B
 f_rB = [
     f_icode == RRMOVQ : i10bytes[8..12];
     f_icode == IRMOVQ : i10bytes[8..12];
@@ -30,6 +32,7 @@ f_rB = [
     1 : REG_NONE;
 ];
 
+# Val C
 f_valC = [
 	f_icode == IRMOVQ : i10bytes[16..80];
 	1 : 0;
@@ -37,6 +40,7 @@ f_valC = [
 
 wire valP:64;
 
+# Handles pc change
 valP = [
 	f_icode == HALT : pc + 1;
     f_icode == NOP : pc + 1;
@@ -49,6 +53,7 @@ valP = [
 
 p_pc = valP;
 
+# Handles Stat
 f_Stat = [
     f_icode == HALT : STAT_HLT;
     f_icode == NOP : STAT_AOK;
@@ -59,6 +64,7 @@ f_Stat = [
     1 : STAT_INS;
 ];
 
+# Stall through remaining stages if STAT is not AOK
 stall_F = [
     f_Stat != STAT_AOK: 1;
     1 : 0
@@ -80,6 +86,7 @@ d_ifun = D_ifun;
 d_valC = D_valC;
 d_Stat = D_Stat;
 
+# What is the source for register A?
 reg_srcA = [
 	D_icode == RRMOVQ : D_rA;
     D_icode == OPQ : D_rA;
@@ -89,6 +96,7 @@ reg_srcA = [
 
 d_srcA = reg_srcA;
 
+# What is the source for register B?
 reg_srcB = [
 	D_icode == OPQ : D_rB;
 	1 : REG_NONE;
@@ -96,36 +104,37 @@ reg_srcB = [
 
 d_srcB = reg_srcB;
 
-# Forwarding value for register A
+# Current register A value
 d_valA = [
-    # Execute stage
+    # Forwarding to execute stage
     reg_srcA == e_dstE : e_valE;
     
-    # Memory stage
+    # Forwarding to memory stage
     reg_srcA == m_dstE : m_valE;
 
-    # Writeback stage
+    # Forwarding to writeback stage
     reg_srcA == reg_dstE : reg_inputE;
 
-    # No forwarding necessary
+    # None
     1 : reg_outputA;
 ];
 
-# Forwarding value for register B
+# Current register B value
 d_valB = [
-    # Execute stage
+    # Forwarding to execute stage
     reg_srcB == e_dstE : e_valE;
 
-    # Memory stage
+    # Forwarding to memory stage
     reg_srcB == m_dstE : m_valE;
 
-    # Writeback stage
+    # Forwarding to writeback stage
     reg_srcB == reg_dstE : reg_inputE;
 
-    # No forwarding necessary
+    # None
     1 : reg_outputB;
 ];
 
+# Destination register
 d_dstE = [
     D_icode == RRMOVQ : D_rB;
     D_icode == IRMOVQ : D_rB;
@@ -154,13 +163,20 @@ e_valA = E_valA;
 e_valB = E_valB;
 e_valC = E_valC;
 
+# ALU
 e_valE = [
-    (E_icode == OPQ)  && (E_ifun == ADDQ) : e_valA + e_valB;
-    (E_icode == OPQ)  && (E_ifun == SUBQ) : e_valB - e_valA;
-    (E_icode == OPQ)  && (E_ifun == ANDQ) : e_valA & e_valB;
-    (E_icode == OPQ)  && (E_ifun == XORQ) : e_valA ^ e_valB;
-    E_icode == IRMOVQ : e_valC;
-    E_icode == RRMOVQ : e_valA;
+    # Addition
+    (E_icode == OPQ)  && (E_ifun == ADDQ) : E_valA + E_valB;
+    # SUbtraction
+    (E_icode == OPQ)  && (E_ifun == SUBQ) : E_valB - E_valA;
+    # AND
+    (E_icode == OPQ)  && (E_ifun == ANDQ) : E_valA & E_valB;
+    # XOR
+    (E_icode == OPQ)  && (E_ifun == XORQ) : E_valA ^ E_valB;
+    # Val C
+    E_icode == IRMOVQ : E_valC;
+    # Val A
+    E_icode == RRMOVQ : E_valA;
     1 : 0;
 ];
 
@@ -170,6 +186,7 @@ c_ZF = (e_valE == 0);
 c_SF = (e_valE >= 0x8000000000000000);
 stall_C = (E_icode != OPQ);
 
+# Checks condition flags
 conditionsMet = [
     E_ifun == 0   : 1;
     E_ifun == 1   : (C_SF || C_ZF);
@@ -184,6 +201,7 @@ conditionsMet = [
 e_srcA = E_srcA;
 e_srcB = E_srcB;
 
+# Determines if destination register when there is CMOVXX
 e_dstE = [
     (E_icode == CMOVXX) && (!conditionsMet): REG_NONE;
     1 : E_dstE;
@@ -214,6 +232,9 @@ m_dstE = M_dstE;
 m_Stat = M_Stat;
 
 ######### Memory output and writeback input register #############
+
+# Nothing happens here right now
+
 register mW {
     icode:4 = 0;
     valA : 64 = 0;
@@ -226,6 +247,7 @@ register mW {
 
 ########## Writeback #############
 
+# Determines what to write into the destination register
 reg_inputE = [
 	W_icode == RRMOVQ : W_valA;
 	W_icode == IRMOVQ : W_valC;
