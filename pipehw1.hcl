@@ -8,53 +8,6 @@ register pF {
     pc : 64 = 0;
 }
 
-######### Fetch output and decode input register #############
-register fD {
-    icode : 4 = 0;
-    ifun : 4 = 0;
-    rA : 4 = REG_NONE;
-    rB : 4 = REG_NONE;
-    valC : 64 = 0;
-    Stat : 3 = STAT_AOK;
-}
-
-######### Decode output and encode input register #############
-register dE {
-    icode : 4 = 0;
-    ifun : 4 = 0;
-    valA : 64 = 0;
-    valB : 64 = 0;
-    valC : 64 = 0;
-    dstE : 4 = REG_NONE;
-    srcA : 4 = REG_NONE;
-    srcB : 4 = REG_NONE;
-    Stat : 3 = STAT_AOK;
-}
-
-######### Encode output and memory input register #############
-register eM {
-    icode : 4 = 0;
-    valA : 64 = 0;
-    valB : 64 = 0;
-    valC : 64 = 0;
-    valE : 64 = 0;
-    dstE : 4 = REG_NONE;
-    srcA : 4 = REG_NONE;
-    srcB : 4 = REG_NONE;
-    Stat : 3 = STAT_AOK;
-}
-
-######### Memory output and writeback input register #############
-register mW {
-    icode:4 = 0;
-    valA : 64 = 0;
-    valB : 64 = 0;
-    valC : 64 = 0;
-    valE : 64 = 0;
-    dstE : 4 = REG_NONE;
-    Stat : 3 = STAT_AOK;
-}
-
 ########## Fetch #############
 pc = F_pc;
 
@@ -110,6 +63,16 @@ stall_F = [
     f_Stat != STAT_AOK: 1;
     1 : 0
 ]; 
+
+######### Fetch output and decode input register #############
+register fD {
+    icode : 4 = 0;
+    ifun : 4 = 0;
+    rA : 4 = REG_NONE;
+    rB : 4 = REG_NONE;
+    valC : 64 = 0;
+    Stat : 3 = STAT_AOK;
+}
 
 ########## Decode #############
 d_icode = D_icode;
@@ -172,6 +135,19 @@ d_dstE = [
 
 ];
 
+######### Decode output and encode input register #############
+register dE {
+    icode : 4 = 0;
+    ifun : 4 = 0;
+    valA : 64 = 0;
+    valB : 64 = 0;
+    valC : 64 = 0;
+    dstE : 4 = REG_NONE;
+    srcA : 4 = REG_NONE;
+    srcB : 4 = REG_NONE;
+    Stat : 3 = STAT_AOK;
+}
+
 ########## Execute #############
 e_icode = E_icode;
 e_valA = E_valA;
@@ -215,6 +191,19 @@ e_dstE = [
 
 e_Stat = E_Stat;
 
+######### Encode output and memory input register #############
+register eM {
+    icode : 4 = 0;
+    valA : 64 = 0;
+    valB : 64 = 0;
+    valC : 64 = 0;
+    valE : 64 = 0;
+    dstE : 4 = REG_NONE;
+    srcA : 4 = REG_NONE;
+    srcB : 4 = REG_NONE;
+    Stat : 3 = STAT_AOK;
+}
+
 ########## Memory #############
 m_icode = M_icode;
 m_valA = M_valA;
@@ -223,6 +212,17 @@ m_valC = M_valC;
 m_valE = M_valE;
 m_dstE = M_dstE;
 m_Stat = M_Stat;
+
+######### Memory output and writeback input register #############
+register mW {
+    icode:4 = 0;
+    valA : 64 = 0;
+    valB : 64 = 0;
+    valC : 64 = 0;
+    valE : 64 = 0;
+    dstE : 4 = REG_NONE;
+    Stat : 3 = STAT_AOK;
+}
 
 ########## Writeback #############
 
