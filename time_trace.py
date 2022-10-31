@@ -43,6 +43,12 @@ def count_time_in(args, fh):
     # total cycles account to branch misprediction penalties
     branch_delay = 0
 
+    # total cycles accounted to stalling
+    stall_num = 0
+
+    # used to keep track of the pc at the current instruction and whether the branch was taken
+    branch_pc = {}
+
 
     for instruction in csv_reader:
         # account for hazards from two consecutive instructions
@@ -51,12 +57,13 @@ def count_time_in(args, fh):
             # if they use overlapping registers.
             #
             # We need an explicit check for '' here to avoid thinking we forward from an
-            # instruction that does not modify registers to an insturction that does not
+            # instruction that does not modify registers to an instruction that does not
             # read both registers.
             forward_from_last = (
                 last_instruction['dst'] != '' and
                 last_instruction['dst'] in (instruction['srcA'], instruction['srcB'])
             )
+
             # add a load-use hazard if the last instruction was a memory read from which we forwarded.
             #
             # We need to do "last_instruction['is_memory_read'] == 'Y'" instead of
@@ -64,23 +71,49 @@ def count_time_in(args, fh):
             # the string 'Y' or 'N' rather than a boolean.
             if args.load_use_hazard and forward_from_last and last_instruction['is_memory_read'] == 'Y':
                 load_use_delay += 1
+            
+            ############### Item 5 ###############
+            # Assume a cycle of stalling is required to read a value written by the previous instruction
+            # if forward_from_last:
+            #     stall_num += 1
 
         # Add delay if the current instruction is a mispredicted branch (assuming
         # branches were predicted as always taken).
         #
         # "instruction['branch_taken']" represents the actual outcome of the branch, not
         # its prediction. (The actual branch prediction is not recorded in our traces.)
-        if instruction['is_conditional_branch'] == 'Y' and instruction['branch_taken'] == 'N':
-            branch_delay += args.branch_delay
+
+        # if instruction['is_conditional_branch'] == 'Y' and instruction['branch_taken'] == 'N':
+        #     branch_delay += args.branch_delay
+
+        ############### Item 4 ###############
+        # if instruction['is_conditional_branch'] == 'Y':
+        #     branch_delay += 2
+
+
+        ############### Item 6 ###############
+        if instruction['is_conditional_branch'] == 'Y' and instruction['orig_pc'] not in branch_pc:
+            branch_pc[instruction['orig_pc']] = 'Y'
+        elif instruction['is_conditional_branch'] == 'Y' and instruction['orig_pc'] in branch_pc:
+            if branch_pc[instruction['orig_pc']] == 'Y':
+                branch_pc[instruction['orig_pc']] == 'Y'
+            elif branch_pc[instruction['orig_pc']] == 'N':
+                branch_pc[instruction['orig_pc']] == 'N'
+
+        if instruction['is_conditional_branch'] == 'Y' and branch_pc[instruction['orig_pc']] != instruction['branch_taken']:
+            branch_delay += 2
+            branch_pc[instruction['orig_pc']] = instruction['branch_taken']
+
         last_instruction = instruction
         num_instructions += 1
 
     return {
         'load_use_delay': load_use_delay,
         'branch_delay': branch_delay,
-        'delay': load_use_delay + branch_delay,
-        'cycles': num_instructions + load_use_delay + branch_delay,
+        'delay': load_use_delay + branch_delay + stall_num,
+        'cycles': num_instructions + load_use_delay + branch_delay + stall_num,
         'instructions': num_instructions,
+        'stall_num': stall_num,
     }
 
 def main():
@@ -100,6 +133,7 @@ def main():
     print("Total instructions", result['instructions'])
     print("Total branch delay", result['branch_delay'])
     print("Total load/use hazard delay", result['load_use_delay'])
+    print("Total stalling", result['stall_num'])
     print("Total delay", result['delay'])
 
 if __name__ == '__main__':
