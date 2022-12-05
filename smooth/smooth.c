@@ -68,33 +68,6 @@ static void assign_sum_to_pixel(pixel *current_pixel, pixel_sum sum)
     return;
 }
 
-static void assign_sum_to_pixel_edge(pixel *current_pixel, pixel_sum sum)
-{
-    current_pixel->red = (unsigned short)(sum.red / 6);
-    current_pixel->green = (unsigned short)(sum.green / 6);
-    current_pixel->blue = (unsigned short)(sum.blue / 6);
-    current_pixel->alpha = (unsigned short)(sum.alpha / 6);
-    return;
-}
-
-static void assign_sum_to_pixel_corner(pixel *current_pixel, pixel_sum sum)
-{
-    current_pixel->red = (unsigned short)(sum.red / 4);
-    current_pixel->green = (unsigned short)(sum.green / 4);
-    current_pixel->blue = (unsigned short)(sum.blue / 4);
-    current_pixel->alpha = (unsigned short)(sum.alpha / 4);
-    return;
-}
-
-// static void assign_sum_to_pixel_norm(pixel *current_pixel, unsigned short pixel_elements[])
-// {
-//     current_pixel->red = (unsigned short)(pixel_elements[0] / 9);
-//     current_pixel->green = (unsigned short)(pixel_elements[1] / 9);
-//     current_pixel->blue = (unsigned short)(pixel_elements[2] / 9);
-//     current_pixel->alpha = (unsigned short)(pixel_elements[3] / 9);
-//     return;
-// }
-
 /*
  * avg - Returns averaged pixel value at (i,j)
  */
@@ -113,179 +86,6 @@ static pixel avg(int dim, int i, int j, pixel *src)
     return current_pixel;
 }
 
-// static pixel avgTop(int dim, int i, pixel *src)
-// {
-
-//     pixel_sum sum;
-//     pixel current_pixel;
-
-//     initialize_pixel_sum(&sum);
-
-//     accumulate_sum(&sum, src[RIDX(i, 0, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i + 1, 0, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i - 1, 0, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i, 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i + 1, 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i - 1, 1, dim)]);
-
-//     assign_sum_to_pixel_edge(&current_pixel, sum);
-
-//     return current_pixel;
-// }
-
-// static pixel avgBottom(int dim, int i, pixel *src)
-// {
-
-//     pixel_sum sum;
-//     pixel current_pixel;
-
-//     initialize_pixel_sum(&sum);
-
-//     accumulate_sum(&sum, src[RIDX(i, dim - 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i + 1, dim - 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i - 1, dim - 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i, dim - 2, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i + 1, dim - 2, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i - 1, dim - 2, dim)]);
-
-//     assign_sum_to_pixel_edge(&current_pixel, sum);
-
-//     return current_pixel;
-// }
-
-// static pixel avgLeft(int dim, int i, pixel *src)
-// {
-
-//     pixel_sum sum;
-//     pixel current_pixel;
-
-//     initialize_pixel_sum(&sum);
-
-//     accumulate_sum(&sum, src[RIDX(0, i, dim)]);
-//     accumulate_sum(&sum, src[RIDX(0, i + 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(0, i - 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(1, i, dim)]);
-//     accumulate_sum(&sum, src[RIDX(1, i + 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(1, i - 1, dim)]);
-
-//     assign_sum_to_pixel_edge(&current_pixel, sum);
-
-//     return current_pixel;
-// }
-
-// static pixel avgRight(int dim, int i, pixel *src)
-// {
-
-//     pixel_sum sum;
-//     pixel current_pixel;
-
-//     initialize_pixel_sum(&sum);
-
-//     accumulate_sum(&sum, src[RIDX(dim - 1, i, dim)]);
-//     accumulate_sum(&sum, src[RIDX(dim - 1, i + 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(dim - 1, i - 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(dim - 2, i, dim)]);
-//     accumulate_sum(&sum, src[RIDX(dim - 2, i + 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(dim - 2, i - 1, dim)]);
-
-//     assign_sum_to_pixel_edge(&current_pixel, sum);
-
-//     return current_pixel;
-// }
-
-// static pixel avgTopLeft(int dim, pixel *src)
-// {
-
-//     pixel_sum sum;
-//     pixel current_pixel;
-
-//     initialize_pixel_sum(&sum);
-
-//     accumulate_sum(&sum, src[RIDX(0, 0, dim)]);
-//     accumulate_sum(&sum, src[RIDX(0, 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(1, 0, dim)]);
-//     accumulate_sum(&sum, src[RIDX(1, 1, dim)]);
-
-//     assign_sum_to_pixel_corner(&current_pixel, sum);
-
-//     return current_pixel;
-// }
-
-// static pixel avgTopRight(int dim, pixel *src)
-// {
-
-//     pixel_sum sum;
-//     pixel current_pixel;
-
-//     initialize_pixel_sum(&sum);
-
-//     accumulate_sum(&sum, src[RIDX(dim - 1, 0, dim)]);
-//     accumulate_sum(&sum, src[RIDX(dim - 2, 0, dim)]);
-//     accumulate_sum(&sum, src[RIDX(dim - 2, 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(dim - 1, 1, dim)]);
-
-//     assign_sum_to_pixel_corner(&current_pixel, sum);
-
-//     return current_pixel;
-// }
-
-// static pixel avgBottomLeft(int dim, pixel *src)
-// {
-
-//     pixel_sum sum;
-//     pixel current_pixel;
-
-//     initialize_pixel_sum(&sum);
-
-//     accumulate_sum(&sum, src[RIDX(0, dim - 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(0, dim - 2, dim)]);
-//     accumulate_sum(&sum, src[RIDX(1, dim - 2, dim)]);
-//     accumulate_sum(&sum, src[RIDX(1, dim - 1, dim)]);
-
-//     assign_sum_to_pixel_corner(&current_pixel, sum);
-
-//     return current_pixel;
-// }
-
-// static pixel avgBottomRight(int dim, pixel *src)
-// {
-
-//     pixel_sum sum;
-//     pixel current_pixel;
-
-//     initialize_pixel_sum(&sum);
-
-//     accumulate_sum(&sum, src[RIDX(dim - 1, dim - 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(dim - 2, dim - 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(dim - 1, dim - 2, dim)]);
-//     accumulate_sum(&sum, src[RIDX(dim - 2, dim - 2, dim)]);
-
-//     assign_sum_to_pixel_corner(&current_pixel, sum);
-
-//     return current_pixel;
-// }
-
-// static pixel avgNorm(int dim, int i, int j, pixel *src)
-// {
-//     pixel_sum sum;
-//     pixel current_pixel;
-
-//     initialize_pixel_sum(&sum);
-
-//     accumulate_sum(&sum, src[RIDX(i, j, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i - 1, j, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i + 1, j, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i, j - 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i, j + 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i + 1, j + 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i + 1, j - 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i - 1, j + 1, dim)]);
-//     accumulate_sum(&sum, src[RIDX(i - 1, j - 1, dim)]);
-
-//     assign_sum_to_pixel_norm(&current_pixel, sum);
-
-//     return current_pixel;
-// }
 /******************************************************
  * Your different versions of the smooth go here
  ******************************************************/
@@ -309,26 +109,65 @@ void another_smooth(int dim, pixel *src, pixel *dst)
     // Edge cases
     for (int i = 1; i < dim - 1; i++)
     {
-        pixel_sum sum;
+        // pixel_sum sum;
         pixel current_pixel;
 
-        initialize_pixel_sum(&sum);
+        // initialize_pixel_sum(&sum);
+        // sum.red = sum.green = sum.blue = sum.alpha = 0;
+        // sum.num = 0;
 
-        accumulate_sum(&sum, src[RIDX(i, 0, dim)]);
-        accumulate_sum(&sum, src[RIDX(i + 1, 0, dim)]);
-        accumulate_sum(&sum, src[RIDX(i - 1, 0, dim)]);
-        accumulate_sum(&sum, src[RIDX(i, 1, dim)]);
-        accumulate_sum(&sum, src[RIDX(i + 1, 1, dim)]);
-        accumulate_sum(&sum, src[RIDX(i - 1, 1, dim)]);
+        // accumulate_sum(&sum, src[RIDX(i, 0, dim)]);
+        //   load 128 bits (4 pixels)
+        __m128i the_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i, 0, dim)]);
+        __m256i the_pixel = _mm256_cvtepu8_epi16(the_pixel1);
 
-        assign_sum_to_pixel_edge(&current_pixel, sum);
+        // accumulate_sum(&sum, src[RIDX(i + 1, 0, dim)]);
+        __m128i right_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i + 1, 0, dim)]);
+        __m256i right_pixel = _mm256_cvtepu8_epi16(right_pixel1);
+
+        // accumulate_sum(&sum, src[RIDX(i - 1, 0, dim)]);
+        __m128i left_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i - 1, 0, dim)]);
+        __m256i left_pixel = _mm256_cvtepu8_epi16(left_pixel1);
+
+        // accumulate_sum(&sum, src[RIDX(i, 1, dim)]);
+        __m128i bot_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i, 1, dim)]);
+        __m256i bot_pixel = _mm256_cvtepu8_epi16(bot_pixel1);
+
+        // accumulate_sum(&sum, src[RIDX(i + 1, 1, dim)]);
+        __m128i botright_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i + 1, 1, dim)]);
+        __m256i botright_pixel = _mm256_cvtepu8_epi16(botright_pixel1);
+
+        // accumulate_sum(&sum, src[RIDX(i - 1, 1, dim)]);
+        __m128i botleft_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i - 1, 1, dim)]);
+        __m256i botleft_pixel = _mm256_cvtepu8_epi16(botleft_pixel1);
+
+        __m256i theright_sum = _mm256_add_epi32(the_pixel, right_pixel);
+        __m256i leftbot_sum = _mm256_add_epi32(left_pixel, bot_pixel);
+        __m256i botrightbotleft_sum = _mm256_add_epi32(botright_pixel, botleft_pixel);
+
+        __m256i theright_leftbot_sum = _mm256_add_epi32(theright_sum, leftbot_sum);
+
+        __m256i sum_of_pixels = _mm256_add_epi32(theright_leftbot_sum, botrightbotleft_sum);
+
+        unsigned short pixel_elements[16];
+        _mm256_storeu_si256((__m256i *)pixel_elements, sum_of_pixels);
+
+        // assign_sum_to_pixel_norm(&current_pixel9, pixel_elements);
+        current_pixel.red = (unsigned short)(pixel_elements[0] / 6);
+        current_pixel.green = (unsigned short)(pixel_elements[1] / 6);
+        current_pixel.blue = (unsigned short)(pixel_elements[2] / 6);
+        current_pixel.alpha = (unsigned short)(pixel_elements[3] / 6);
+
+        // assign_sum_to_pixel_edge(&current_pixel, sum);
 
         dst[RIDX(i, 0, dim)] = current_pixel; // Top edge
 
         pixel_sum sum2;
         pixel current_pixel2;
 
-        initialize_pixel_sum(&sum2);
+        // initialize_pixel_sum(&sum2);
+        sum2.red = sum2.green = sum2.blue = sum2.alpha = 0;
+        sum2.num = 0;
 
         accumulate_sum(&sum2, src[RIDX(i, dim - 1, dim)]);
         accumulate_sum(&sum2, src[RIDX(i + 1, dim - 1, dim)]);
@@ -337,14 +176,20 @@ void another_smooth(int dim, pixel *src, pixel *dst)
         accumulate_sum(&sum2, src[RIDX(i + 1, dim - 2, dim)]);
         accumulate_sum(&sum2, src[RIDX(i - 1, dim - 2, dim)]);
 
-        assign_sum_to_pixel_edge(&current_pixel2, sum2);
+        // assign_sum_to_pixel_edge(&current_pixel2, sum2);
+        current_pixel2.red = (unsigned short)(sum2.red / 6);
+        current_pixel2.green = (unsigned short)(sum2.green / 6);
+        current_pixel2.blue = (unsigned short)(sum2.blue / 6);
+        current_pixel2.alpha = (unsigned short)(sum2.alpha / 6);
 
         dst[RIDX(i, dim - 1, dim)] = current_pixel2; // Bottom edge
 
         pixel_sum sum3;
         pixel current_pixel3;
 
-        initialize_pixel_sum(&sum3);
+        // initialize_pixel_sum(&sum3);
+        sum3.red = sum3.green = sum3.blue = sum3.alpha = 0;
+        sum3.num = 0;
 
         accumulate_sum(&sum3, src[RIDX(0, i, dim)]);
         accumulate_sum(&sum3, src[RIDX(0, i + 1, dim)]);
@@ -353,14 +198,20 @@ void another_smooth(int dim, pixel *src, pixel *dst)
         accumulate_sum(&sum3, src[RIDX(1, i + 1, dim)]);
         accumulate_sum(&sum3, src[RIDX(1, i - 1, dim)]);
 
-        assign_sum_to_pixel_edge(&current_pixel3, sum3);
+        // assign_sum_to_pixel_edge(&current_pixel3, sum3);
+        current_pixel3.red = (unsigned short)(sum3.red / 6);
+        current_pixel3.green = (unsigned short)(sum3.green / 6);
+        current_pixel3.blue = (unsigned short)(sum3.blue / 6);
+        current_pixel3.alpha = (unsigned short)(sum3.alpha / 6);
 
         dst[RIDX(0, i, dim)] = current_pixel3; // Left edge
 
         pixel_sum sum4;
         pixel current_pixel4;
 
-        initialize_pixel_sum(&sum4);
+        // initialize_pixel_sum(&sum4);
+        sum4.red = sum4.green = sum4.blue = sum4.alpha = 0;
+        sum4.num = 0;
 
         accumulate_sum(&sum4, src[RIDX(dim - 1, i, dim)]);
         accumulate_sum(&sum4, src[RIDX(dim - 1, i + 1, dim)]);
@@ -369,7 +220,11 @@ void another_smooth(int dim, pixel *src, pixel *dst)
         accumulate_sum(&sum4, src[RIDX(dim - 2, i + 1, dim)]);
         accumulate_sum(&sum4, src[RIDX(dim - 2, i - 1, dim)]);
 
-        assign_sum_to_pixel_edge(&current_pixel4, sum4);
+        // assign_sum_to_pixel_edge(&current_pixel4, sum4);
+        current_pixel4.red = (unsigned short)(sum4.red / 6);
+        current_pixel4.green = (unsigned short)(sum4.green / 6);
+        current_pixel4.blue = (unsigned short)(sum4.blue / 6);
+        current_pixel4.alpha = (unsigned short)(sum4.alpha / 6);
 
         dst[RIDX(dim - 1, i, dim)] = current_pixel4; // Right edge
     }
@@ -378,56 +233,80 @@ void another_smooth(int dim, pixel *src, pixel *dst)
     pixel_sum sum5;
     pixel current_pixel5;
 
-    initialize_pixel_sum(&sum5);
+    // initialize_pixel_sum(&sum5);
+    sum5.red = sum5.green = sum5.blue = sum5.alpha = 0;
+    sum5.num = 0;
 
     accumulate_sum(&sum5, src[RIDX(0, 0, dim)]);
     accumulate_sum(&sum5, src[RIDX(0, 1, dim)]);
     accumulate_sum(&sum5, src[RIDX(1, 0, dim)]);
     accumulate_sum(&sum5, src[RIDX(1, 1, dim)]);
 
-    assign_sum_to_pixel_corner(&current_pixel5, sum5);
+    // assign_sum_to_pixel_corner(&current_pixel5, sum5);
+    current_pixel5.red = (unsigned short)(sum5.red / 4);
+    current_pixel5.green = (unsigned short)(sum5.green / 4);
+    current_pixel5.blue = (unsigned short)(sum5.blue / 4);
+    current_pixel5.alpha = (unsigned short)(sum5.alpha / 4);
 
     dst[RIDX(0, 0, dim)] = current_pixel5; // Top left
 
     pixel_sum sum6;
     pixel current_pixel6;
 
-    initialize_pixel_sum(&sum6);
+    // initialize_pixel_sum(&sum6);
+    sum6.red = sum6.green = sum6.blue = sum6.alpha = 0;
+    sum6.num = 0;
 
     accumulate_sum(&sum6, src[RIDX(dim - 1, 0, dim)]);
     accumulate_sum(&sum6, src[RIDX(dim - 2, 0, dim)]);
     accumulate_sum(&sum6, src[RIDX(dim - 2, 1, dim)]);
     accumulate_sum(&sum6, src[RIDX(dim - 1, 1, dim)]);
 
-    assign_sum_to_pixel_corner(&current_pixel6, sum6);
+    // assign_sum_to_pixel_corner(&current_pixel6, sum6);
+    current_pixel6.red = (unsigned short)(sum6.red / 4);
+    current_pixel6.green = (unsigned short)(sum6.green / 4);
+    current_pixel6.blue = (unsigned short)(sum6.blue / 4);
+    current_pixel6.alpha = (unsigned short)(sum6.alpha / 4);
 
     dst[RIDX(dim - 1, 0, dim)] = current_pixel6; // Top right
 
     pixel_sum sum7;
     pixel current_pixel7;
 
-    initialize_pixel_sum(&sum7);
+    // initialize_pixel_sum(&sum7);
+    sum7.red = sum7.green = sum7.blue = sum7.alpha = 0;
+    sum7.num = 0;
 
     accumulate_sum(&sum7, src[RIDX(0, dim - 1, dim)]);
     accumulate_sum(&sum7, src[RIDX(0, dim - 2, dim)]);
     accumulate_sum(&sum7, src[RIDX(1, dim - 2, dim)]);
     accumulate_sum(&sum7, src[RIDX(1, dim - 1, dim)]);
 
-    assign_sum_to_pixel_corner(&current_pixel7, sum7);
+    // assign_sum_to_pixel_corner(&current_pixel7, sum7);
+    current_pixel7.red = (unsigned short)(sum7.red / 4);
+    current_pixel7.green = (unsigned short)(sum7.green / 4);
+    current_pixel7.blue = (unsigned short)(sum7.blue / 4);
+    current_pixel7.alpha = (unsigned short)(sum7.alpha / 4);
 
     dst[RIDX(0, dim - 1, dim)] = current_pixel7; // Bottom left
 
     pixel_sum sum8;
     pixel current_pixel8;
 
-    initialize_pixel_sum(&sum8);
+    // initialize_pixel_sum(&sum8);
+    sum8.red = sum8.green = sum8.blue = sum8.alpha = 0;
+    sum8.num = 0;
 
     accumulate_sum(&sum8, src[RIDX(dim - 1, dim - 1, dim)]);
     accumulate_sum(&sum8, src[RIDX(dim - 2, dim - 1, dim)]);
     accumulate_sum(&sum8, src[RIDX(dim - 1, dim - 2, dim)]);
     accumulate_sum(&sum8, src[RIDX(dim - 2, dim - 2, dim)]);
 
-    assign_sum_to_pixel_corner(&current_pixel8, sum8);
+    // assign_sum_to_pixel_corner(&current_pixel8, sum8);
+    current_pixel8.red = (unsigned short)(sum8.red / 4);
+    current_pixel8.green = (unsigned short)(sum8.green / 4);
+    current_pixel8.blue = (unsigned short)(sum8.blue / 4);
+    current_pixel8.alpha = (unsigned short)(sum8.alpha / 4);
 
     dst[RIDX(dim - 1, dim - 1, dim)] = current_pixel8; // Bottom right
 
@@ -436,10 +315,12 @@ void another_smooth(int dim, pixel *src, pixel *dst)
     {
         for (int j = 1; j < dim - 1; j++)
         {
-            pixel_sum sum9;
+            // pixel_sum sum9;
             pixel current_pixel9;
 
-            initialize_pixel_sum(&sum9);
+            // initialize_pixel_sum(&sum9);
+            // sum9.red = sum9.green = sum9.blue = sum9.alpha = 0;
+            // sum9.num = 0;
 
             // accumulate_sum(&sum9, src[RIDX(i, j, dim)]);
             //  load 128 bits (4 pixels)
