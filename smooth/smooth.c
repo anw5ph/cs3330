@@ -86,14 +86,14 @@ static void assign_sum_to_pixel_corner(pixel *current_pixel, pixel_sum sum)
     return;
 }
 
-static void assign_sum_to_pixel_norm(pixel *current_pixel, pixel_sum sum)
-{
-    current_pixel->red = (unsigned short)(sum.red / 9);
-    current_pixel->green = (unsigned short)(sum.green / 9);
-    current_pixel->blue = (unsigned short)(sum.blue / 9);
-    current_pixel->alpha = (unsigned short)(sum.alpha / 9);
-    return;
-}
+// static void assign_sum_to_pixel_norm(pixel *current_pixel, unsigned short pixel_elements[])
+// {
+//     current_pixel->red = (unsigned short)(pixel_elements[0] / 9);
+//     current_pixel->green = (unsigned short)(pixel_elements[1] / 9);
+//     current_pixel->blue = (unsigned short)(pixel_elements[2] / 9);
+//     current_pixel->alpha = (unsigned short)(pixel_elements[3] / 9);
+//     return;
+// }
 
 /*
  * avg - Returns averaged pixel value at (i,j)
@@ -441,17 +441,63 @@ void another_smooth(int dim, pixel *src, pixel *dst)
 
             initialize_pixel_sum(&sum9);
 
-            accumulate_sum(&sum9, src[RIDX(i, j, dim)]);
-            accumulate_sum(&sum9, src[RIDX(i - 1, j, dim)]);
-            accumulate_sum(&sum9, src[RIDX(i + 1, j, dim)]);
-            accumulate_sum(&sum9, src[RIDX(i, j - 1, dim)]);
-            accumulate_sum(&sum9, src[RIDX(i, j + 1, dim)]);
-            accumulate_sum(&sum9, src[RIDX(i + 1, j + 1, dim)]);
-            accumulate_sum(&sum9, src[RIDX(i + 1, j - 1, dim)]);
-            accumulate_sum(&sum9, src[RIDX(i - 1, j + 1, dim)]);
-            accumulate_sum(&sum9, src[RIDX(i - 1, j - 1, dim)]);
+            // accumulate_sum(&sum9, src[RIDX(i, j, dim)]);
+            //  load 128 bits (4 pixels)
+            __m128i the_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i, j, dim)]);
+            __m256i the_pixel = _mm256_cvtepu8_epi16(the_pixel1);
 
-            assign_sum_to_pixel_norm(&current_pixel9, sum9);
+            // accumulate_sum(&sum9, src[RIDX(i - 1, j, dim)]);
+            __m128i left_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i - 1, j, dim)]);
+            __m256i left_pixel = _mm256_cvtepu8_epi16(left_pixel1);
+
+            // accumulate_sum(&sum9, src[RIDX(i + 1, j, dim)]);
+            __m128i right_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i + 1, j, dim)]);
+            __m256i right_pixel = _mm256_cvtepu8_epi16(right_pixel1);
+
+            // accumulate_sum(&sum9, src[RIDX(i, j - 1, dim)]);
+            __m128i top_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i, j - 1, dim)]);
+            __m256i top_pixel = _mm256_cvtepu8_epi16(top_pixel1);
+
+            // accumulate_sum(&sum9, src[RIDX(i, j + 1, dim)]);
+            __m128i bot_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i, j + 1, dim)]);
+            __m256i bot_pixel = _mm256_cvtepu8_epi16(bot_pixel1);
+
+            // accumulate_sum(&sum9, src[RIDX(i + 1, j + 1, dim)]);
+            __m128i botright_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i + 1, j + 1, dim)]);
+            __m256i botright_pixel = _mm256_cvtepu8_epi16(botright_pixel1);
+
+            // accumulate_sum(&sum9, src[RIDX(i + 1, j - 1, dim)]);
+            __m128i topright_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i + 1, j - 1, dim)]);
+            __m256i topright_pixel = _mm256_cvtepu8_epi16(topright_pixel1);
+
+            // accumulate_sum(&sum9, src[RIDX(i - 1, j + 1, dim)]);
+            __m128i botleft_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i - 1, j + 1, dim)]);
+            __m256i botleft_pixel = _mm256_cvtepu8_epi16(botleft_pixel1);
+
+            // accumulate_sum(&sum9, src[RIDX(i - 1, j - 1, dim)]);
+            __m128i topleft_pixel1 = _mm_loadu_si128((__m128i *)&src[RIDX(i - 1, j - 1, dim)]);
+            __m256i topleft_pixel = _mm256_cvtepu8_epi16(topleft_pixel1);
+
+            __m256i theleft_sum = _mm256_add_epi32(the_pixel, left_pixel);
+            __m256i righttop_sum = _mm256_add_epi32(right_pixel, top_pixel);
+            __m256i botbotright_sum = _mm256_add_epi32(bot_pixel, botright_pixel);
+            __m256i toprightbotleft_sum = _mm256_add_epi32(topright_pixel, botleft_pixel);
+
+            __m256i theleft_righttop_sum = _mm256_add_epi32(theleft_sum, righttop_sum);
+            __m256i botbotright_toprightbotleft_sum = _mm256_add_epi32(botbotright_sum, toprightbotleft_sum);
+
+            __m256i theleft_righttop__botbotright_toprightbotleft_sum = _mm256_add_epi32(theleft_righttop_sum, botbotright_toprightbotleft_sum);
+
+            __m256i sum_of_pixels = _mm256_add_epi32(theleft_righttop__botbotright_toprightbotleft_sum, topleft_pixel);
+
+            unsigned short pixel_elements[16];
+            _mm256_storeu_si256((__m256i *)pixel_elements, sum_of_pixels);
+
+            // assign_sum_to_pixel_norm(&current_pixel9, pixel_elements);
+            current_pixel9.red = (unsigned short)(pixel_elements[0] / 9);
+            current_pixel9.green = (unsigned short)(pixel_elements[1] / 9);
+            current_pixel9.blue = (unsigned short)(pixel_elements[2] / 9);
+            current_pixel9.alpha = (unsigned short)(pixel_elements[3] / 9);
 
             dst[RIDX(i, j, dim)] = current_pixel9; // Normal case
         }
